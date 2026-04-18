@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: iphone_cover_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/iphone_cover_db
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: some_random_secret_at_least_32_chars_long
+    depends_on:
+      - db
+
+volumes:
+  db_data:
